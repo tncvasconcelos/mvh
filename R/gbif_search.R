@@ -27,8 +27,7 @@ search.specimen.metadata <- function(species_name, ...) {
     }
   }
   #cat("Search for", species_name, "done!", "\n")
-  metadata <- subset(metadata, metadata$basisOfRecord=="PRESERVED_SPECIMEN")
-  metadata <- subset(metadata, !grepl("inaturalist",metadata$media_url))
+  metadata <- subset(metadata, !grepl("inaturalist",metadata$media_url)) # removing inaturalist images
   return(metadata)
 }
 
@@ -42,7 +41,7 @@ search.specimen.metadata <- function(species_name, ...) {
 #' @importFrom utils download.file
 #'
 #' @export
-download.specimen.image <- function(metadata, resize=c(""), dir_name="my_virtual_collection") {
+download.specimen.image <- function(metadata, dir_name="my_virtual_collection", resize=NULL) {
   create_directory(dir_name)
   for(specimen_index in 1:nrow(metadata)) {
     species_name <- metadata$species[specimen_index]
@@ -56,6 +55,13 @@ download.specimen.image <- function(metadata, resize=c(""), dir_name="my_virtual
       image_write(try_img, file_name)
       cat("resized","\n")
       remove("try_img")
+    if(!is.null(resize)) {
+      try(try_img <- resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]))
+      if(exists("try_img")) {
+        image_write(try_img, file_name)
+        cat("resized","\n")
+        remove("try_img")
+      }
     }
   }
 }
