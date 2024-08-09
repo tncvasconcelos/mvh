@@ -2,8 +2,10 @@
 
 export(create_directory)
 export(download.specimen.image)
+export(plot_specimens_by_institution)
 export(resize.image)
 export(search.specimen.metadata)
+importFrom(graphics,barplot)
 importFrom(magick,geometry_size_pixels)
 importFrom(magick,image_info)
 importFrom(magick,image_read)
