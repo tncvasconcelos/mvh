@@ -55,12 +55,13 @@ download.specimen.image <- function(metadata, dir_name="my_virtual_collection", 
       image_write(try_img, file_name)
       cat("resized","\n")
       remove("try_img")
-    if(!is.null(resize)) {
-      try(try_img <- resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]))
-      if(exists("try_img")) {
-        image_write(try_img, file_name)
-        cat("resized","\n")
-        remove("try_img")
+      if(!is.null(resize)) {
+        try(try_img <- resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]))
+        if(exists("try_img")) {
+          image_write(try_img, file_name)
+          cat("resized","\n")
+          remove("try_img")
+        }
       }
     }
   }

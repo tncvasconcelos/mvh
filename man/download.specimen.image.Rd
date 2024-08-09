@@ -6,16 +6,16 @@
 \usage{
 download.specimen.image(
   metadata,
-  resize = c(""),
-  dir_name = "my_virtual_collection"
+  dir_name = "my_virtual_collection",
+  resize = NULL
 )
 }
 \arguments{
 \item{metadata}{A data frame containing specimen metadata, as returned by search.specimen.metadata().}
 
-\item{resize}{A character vector specifying resize options (currently not used in the function).}
-
 \item{dir_name}{A character string specifying the directory to save the downloaded images.}
+
+\item{resize}{A character vector specifying resize options (currently not used in the function).}
 }
 \description{
 This function downloads specimen images based on the provided metadata and optionally resizes them.
