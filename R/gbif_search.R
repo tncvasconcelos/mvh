@@ -39,6 +39,7 @@ search.specimen.metadata <- function(species_name, ...) {
 #' @param metadata A data frame containing specimen metadata, as returned by search.specimen.metadata().
 #' @param resize A character vector specifying resize options (currently not used in the function).
 #' @param dir_name A character string specifying the directory to save the downloaded images.
+#' @importFrom utils download.file
 #'
 #' @export
 download.specimen.image <- function(metadata, resize=c(""), dir_name="my_virtual_collection") {
@@ -55,6 +56,6 @@ download.specimen.image <- function(metadata, resize=c(""), dir_name="my_virtual
       image_write(try_img, file_name)
       cat("resized","\n")
       remove("try_img")
-    }  
+    }
   }
 }
