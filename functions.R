@@ -1,4 +1,5 @@
 # Arguments:
+# Function to search metadata
 search.specimen.metadata <- function(species_name, ...) {
   #--------------------------------------
   # Search GBIF for records with images
@@ -22,7 +23,7 @@ search.specimen.metadata <- function(species_name, ...) {
   return(metadata)
 }
 
-
+# Function to download specimens
 download.specimen.image <- function(metadata, resize=c(""), dir_name="my_virtual_collection") {
   create_directory(dir_name)
   for(specimen_index in 1:nrow(metadata)) {
@@ -60,4 +61,40 @@ create_directory <- function(dir_name) {
   } else {
     message("Directory '", dir_name, "' already exists.")
   }
+}
+
+
+# resizing image
+resize.image <- function(file_name, min_megapixels = 20, max_megapixels = 25) {
+  # Load the image
+  img <- image_read(file_name)
+  
+  # Get the current dimensions of the image
+  current_width <- image_info(img)$width
+  current_height <- image_info(img)$height
+  
+  # Calculate the current megapixels
+  current_megapixels <- (current_width * current_height) / 1e6
+  
+  # Check if the current megapixels are already within the desired range
+  if (current_megapixels >= min_megapixels && current_megapixels <= max_megapixels) {
+    return(img)
+  }
+  
+  # Calculate the scaling factor needed to get within the desired megapixel range
+  scaling_factor <- sqrt(min_megapixels / current_megapixels)
+  scaled_width <- round(current_width * scaling_factor)
+  scaled_height <- round(current_height * scaling_factor)
+  
+  # Ensure the scaled image is not too large
+  if (scaled_width * scaled_height / 1e6 > max_megapixels) {
+    scaling_factor <- sqrt(max_megapixels / current_megapixels)
+    scaled_width <- round(current_width * scaling_factor)
+    scaled_height <- round(current_height * scaling_factor)
+  }
+  
+  # Resize the image
+  resized_img <- image_resize(img, geometry_size_pixels(scaled_width, scaled_height, preserve_aspect = TRUE))
+  
+  return(resized_img)
 }
