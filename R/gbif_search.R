@@ -9,7 +9,7 @@
 #'
 #' @importFrom rgbif occ_search
 #' @export
-search.specimen.metadata <- function(species_name, ...) {
+search_specimen_metadata <- function(species_name, ...) {
   #--------------------------------------
   # Search GBIF for records with images
   Sys.sleep(2)
@@ -41,20 +41,21 @@ search.specimen.metadata <- function(species_name, ...) {
 #' @importFrom utils download.file
 #'
 #' @export
-download.specimen.image <- function(metadata, dir_name="my_virtual_collection", resize=NULL) {
+download_specimen_images <- function(metadata, dir_name="my_virtual_collection2", resize=NULL) {
   create_directory(dir_name)
+  failed <- matrix(nrow=0, ncol=3)
   for(specimen_index in 1:nrow(metadata)) {
     species_name <- metadata$species[specimen_index]
     gbif_key <- metadata$key[specimen_index]
     media <- metadata$media_url[specimen_index]
     file_name <- paste0(dir_name,"/",paste0(gsub(" ","_",species_name),"_", gbif_key,".jpeg"))
     Sys.sleep(2)
-    try(download.file.int(media, file_name))
-    try(try_img <- resize.image(file_name))
-    if(exists("try_img")) {
-      image_write(try_img, file_name)
-      cat("resized","\n")
-      remove("try_img")
+    error_message <- NULL
+    #try(download.file.int(media, file_name))
+    tryCatch({download.file.int(media, file_name)}, error = function(e) {
+      error_message <- e$message
+    })
+    if(!is.null(error_message)) {
       if(!is.null(resize)) {
         try(try_img <- resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]))
         if(exists("try_img")) {
@@ -63,6 +64,11 @@ download.specimen.image <- function(metadata, dir_name="my_virtual_collection", 
           remove("try_img")
         }
       }
+    } else {
+      failed <- rbind(failed, c(species_name, gbif_key, error_message))
+      write.csv(failed, file="download_failed.csv", row.names=F)
     }
   }
 }
+
+

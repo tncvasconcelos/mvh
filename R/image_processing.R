@@ -12,11 +12,11 @@
 #' @export
 resize.image <- function(file_name, min_megapixels = 20, max_megapixels = 25) {
   # Load the image
-  img <- image_read(file_name)
+  img <- magick::image_read(file_name)
 
   # Get the current dimensions of the image
-  current_width <- image_info(img)$width
-  current_height <- image_info(img)$height
+  current_width <- magick::image_info(img)$width
+  current_height <- magick::image_info(img)$height
 
   # Calculate the current megapixels
   current_megapixels <- (current_width * current_height) / 1e6
@@ -39,7 +39,7 @@ resize.image <- function(file_name, min_megapixels = 20, max_megapixels = 25) {
   }
 
   # Resize the image
-  resized_img <- image_resize(img, geometry_size_pixels(scaled_width, scaled_height, preserve_aspect = TRUE))
+  resized_img <- magick::image_resize(img, magick::geometry_size_pixels(scaled_width, scaled_height, preserve_aspect = TRUE))
 
   return(resized_img)
 }
