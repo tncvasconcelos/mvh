@@ -10,6 +10,7 @@
 #' @importFrom rgbif occ_search
 #' @export
 search_specimen_metadata <- function(species_name, ...) {
+  species_name="Osbeckia nepalensis"
   #--------------------------------------
   # Search GBIF for records with images
   all_gbif_data <- occ_search(scientificName = species_name , mediaType = "StillImage", basisOfRecord="PRESERVED_SPECIMEN", ...)
@@ -20,10 +21,14 @@ search_specimen_metadata <- function(species_name, ...) {
   metadata$license <- NA
   for(obs_index in 1:nrow(metadata)) {
     media_info <- all_gbif_data$media[[obs_index]][[1]]
-    if("identifier" %in% names(media_info[[1]])) {
-      metadata$media_url[obs_index] <- media_info[[1]]$identifier
-      metadata$license <- media_info[[1]]$license
-    }
+    media_info <- unlist(media_info)
+    names_media_info <- names(media_info)
+    if("identifier" %in% names_media_info) {
+      potential_url <- media_info[which(names(media_info) %in% "identifier")]
+      potential_url <- subset(potential_url, !grepl("manifest",potential_url)) # getting rid of the "manifest" urls on the identifier slots
+      metadata$media_url[obs_index] <- unname(potential_url)
+      metadata$license <-  media_info[which(names(media_info) %in% "license")][1]
+    } 
   }
   #cat("Search for", species_name, "done!", "\n")
   metadata <- subset(metadata, !grepl("inaturalist",metadata$media_url)) # removing inaturalist images
@@ -46,7 +51,8 @@ search_specimen_metadata <- function(species_name, ...) {
 download_specimen_images <- function(metadata,
   dir_name="my_virtual_collection",
   resize=NULL,
-  sleep=2) {
+  sleep=2,
+  result_file_name="download_results") {
   create_directory(dir_name)
 
   # Initialize the 'status' and 'error_message' columns
@@ -80,9 +86,9 @@ download_specimen_images <- function(metadata,
       metadata$error_message[specimen_index] <- download[1]
     }
     # Subset metadata to include only the selected columns
-    metadata_subset <- metadata[, c("scientificName", "gbifID", "decimalLatitude", "decimalLongitude", "eventDate", "country", "status", "error_message")]
+    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "decimalLatitude", "decimalLongitude", "eventDate", "country", "status", "error_message")]
     # Save the output
-    write.csv(metadata_subset, file="download_results.csv", row.names=FALSE)
+    write.csv(metadata_subset, file=paste0(result_file_name, ".csv"), row.names=FALSE)
   }
   return(metadata_subset)
 }
