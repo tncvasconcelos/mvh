@@ -44,7 +44,7 @@ search_specimen_metadata <- function(species_name, ...) {
 #'
 #' @export
 download_specimen_images <- function(metadata,
-  dir_name="my_virtual_collection2",
+  dir_name="my_virtual_collection",
   resize=NULL,
   sleep=2) {
   create_directory(dir_name)
