@@ -6,8 +6,9 @@
 \usage{
 download_specimen_images(
   metadata,
-  dir_name = "my_virtual_collection",
-  resize = NULL
+  dir_name = "my_virtual_collection2",
+  resize = NULL,
+  sleep = 2
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ download_specimen_images(
 \item{dir_name}{A character string specifying the directory to save the downloaded images.}
 
 \item{resize}{A character vector specifying resize options (currently not used in the function).}
+
+\item{sleep}{Numeric. Number of seconds to wait between downloads.}
 }
 \description{
 This function downloads specimen images based on the provided metadata and optionally resizes them.
