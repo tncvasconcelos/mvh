@@ -79,14 +79,11 @@ download_specimen_images <- function(metadata,
       metadata$status[specimen_index] <- "failed"
       metadata$error_message[specimen_index] <- download[1]
     }
+    # Subset metadata to include only the selected columns
+    metadata_subset <- metadata[, c("scientificName", "gbifID", "decimalLatitude", "decimalLongitude", "eventDate", "country", "status", "error_message")]
+    # Save the output
+    write.csv(metadata_subset, file="download_results.csv", row.names=FALSE)
   }
-
-  # Subset metadata to include only the selected columns
-  metadata_subset <- metadata[, c("scientificName", "gbifID", "decimalLatitude", "decimalLongitude", "eventDate", "country", "status", "error_message")]
-
-  # Save the output
-  write.csv(metadata_subset, file="download_results.csv", row.names=FALSE)
-
   return(metadata_subset)
 }
 
