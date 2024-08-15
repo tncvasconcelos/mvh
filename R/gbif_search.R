@@ -16,8 +16,6 @@ search_specimen_metadata <- function(species_name, ...) {
   #--------------------------------------
   # Extract URL and licence type
   metadata <- as.data.frame(all_gbif_data$data)
-  #metadata$media_url <- NA
-  #metadata$license <- NA
   metadata_final <- matrix(nrow=0, ncol=ncol(metadata)+2)
   for(obs_index in 1:nrow(metadata)) {
     media_info <- all_gbif_data$media[[obs_index]][[1]]
@@ -26,17 +24,17 @@ search_specimen_metadata <- function(species_name, ...) {
     if("identifier" %in% names_media_info) {
       potential_url <- media_info[which(names(media_info) %in% "identifier")]
       potential_url <- subset(potential_url, !grepl("manifest",potential_url)) # getting rid of the "manifest" urls on the identifier slots
-     # if(length(potential_url)>1) { # more than one url often happens when there are many sheets for the same specimen 
-        for(i in 1:length(potential_url)) {
-          media_license_and_url <- cbind(media_info[which(names(media_info) %in% "license")][i], unname(potential_url)[i])
-          metadata_final <- rbind(metadata_final, cbind(metadata[obs_index, ], media_license_and_url))
-          }
-     # }
+      for(i in 1:length(potential_url)) {
+        if(grepl("gbif$", potential_url[i])) {
+          potential_url[i] <- gsub("gbif$","",potential_url[i])
+        }
+        media_license_and_url <- cbind(media_info[which(names(media_info) %in% "license")][i], unname(potential_url)[i])
+        metadata_final <- rbind(metadata_final, cbind(metadata[obs_index, ], media_license_and_url))
+      }
     } 
   }
   metadata_final <- as.data.frame(metadata_final)
   colnames(metadata_final) <- c(colnames(metadata), "license","media_url")
-  #cat("Search for", species_name, "done!", "\n")
   metadata_final <- subset(metadata_final, !grepl("inaturalist",metadata_final$media_url)) # removing inaturalist images
   metadata_final <- metadata_final[!is.na(metadata_final$media_url),]
   cat(nrow(metadata_final), "records of", species_name, "found with media data.\n")
@@ -63,6 +61,7 @@ download_specimen_images <- function(metadata,
   create_directory(dir_name)
 
   # Initialize the 'status' and 'error_message' columns
+  metadata$filesize <- NA
   metadata$status <- NA
   metadata$error_message <- NA
   options(timeout = max(timeout_limit, getOption("timeout")))
@@ -77,7 +76,7 @@ download_specimen_images <- function(metadata,
     Sys.sleep(sleep)
     if(!inherits(download, "try-error")) {  # Check if download succeeded
       metadata$status[specimen_index] <- "succeeded"
-
+      metadata$filesize[specimen_index] <- as.data.frame(magick::image_info(magick::image_read(file_name)))[,"filesize"]
       # Attempt to resize the image if required
       if(!is.null(resize)) {
         try_img <- try(resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]), silent = TRUE)
@@ -94,7 +93,7 @@ download_specimen_images <- function(metadata,
       metadata$error_message[specimen_index] <- download[1]
     }
     # Subset metadata to include only the selected columns
-    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "decimalLatitude", "decimalLongitude", "eventDate", "country", "license","rightsHolder","status", "error_message")]
+    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "decimalLatitude", "decimalLongitude", "eventDate", "country", "license","rightsHolder","filesize","status", "error_message")]
     
     # Save the output
     write.csv(metadata_subset, file=paste0(result_file_name, ".csv"), row.names=FALSE)
