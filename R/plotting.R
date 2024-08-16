@@ -16,3 +16,10 @@ plot_specimens_by_institution <- function(metadata) {
     xlab = "", ylab = "Number of Specimens",
     col = "lightblue", las = 2)
 }
+
+plot_specimens_by_country <- function(metadata) {
+  sorted_counts <- sort(table(metadata$country), decreasing = TRUE)
+  barplot(sorted_counts, main = "Specimens by Country",
+          xlab = "", ylab = "Number of Specimens",
+          col = "orange3", las = 2)
+}

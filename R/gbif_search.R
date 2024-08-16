@@ -75,25 +75,41 @@ search_specimen_metadata <- function(taxon_name=NULL,
 #' @export
 download_specimen_images <- function(metadata,
   dir_name="my_virtual_collection",
-  resize=NULL,
+  resize=75,
   sleep=2,
   result_file_name="download_results",
   timeout_limit=300) {
   
   create_directory(dir_name)
+  
+  if(nrow(metadata)==0) {
+    stop("No records to download in metadata.")
+  }
+  
   # Initialize the 'status' and 'error_message' columns
   metadata$filesize <- NA
   metadata$status <- NA
   metadata$error_message <- NA
   if(is.null(metadata$rightsHolder)){
     metadata$rightsHolder <- NA
+  } 
+  if(is.null(metadata$scientificName)){
+    metadata$scientificName <- NA
   }
-  
-  options(timeout = max(timeout_limit, getOption("timeout")))
+  if(is.null(metadata$gbifID)){
+    metadata$gbifID <- NA
+  }
+  if(is.null(metadata$institutionCode)){
+    metadata$institutionCode <- NA
+  }
+  if(is.null(metadata$eventDate)){
+    metadata$eventDate <- NA
+  }
+  if(is.null(metadata$country)){
+    metadata$country <- NA
+  }
 
-  if(nrow(metadata)==0) {
-    stop("No records to download in metadata.")
-  }
+  options(timeout = max(timeout_limit, getOption("timeout")))
   
   for(specimen_index in 1:nrow(metadata)) {
     species_name <- metadata$species[specimen_index]
@@ -111,9 +127,10 @@ download_specimen_images <- function(metadata,
       metadata$filesize[specimen_index] <- as.data.frame(magick::image_info(magick::image_read(file_name)))[,"filesize"]
       # Attempt to resize the image if required
       if(!is.null(resize)) {
-        try_img <- try(resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]), silent = TRUE)
+        try_img <- try(magick::image_read(file_name), silent = TRUE)
+        #try_img <- try(resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]), silent = TRUE)
         if(!inherits(try_img, "try-error")) {  # Check if resizing succeeded
-          image_write(try_img, file_name)
+          image_write(try_img, file_name, quality=resize)
           cat("resized","\n")
         } else {
           metadata$status[specimen_index] <- "failed"
