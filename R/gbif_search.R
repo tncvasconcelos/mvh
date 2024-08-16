@@ -9,13 +9,27 @@
 #'
 #' @importFrom rgbif occ_search
 #' @export
-search_specimen_metadata <- function(species_name, ...) {
+search_specimen_metadata <- function(taxon_name=NULL, coordinate=NULL, buffer_distance=NULL, limit=500, ...) {
+  if(!is.null(coordinate)) {
+    if(is.null(buffer_distance)){
+      buffer_distance=1
+    } 
+    # coordinates should be passed as e.g. coordinate=c(40, -120)
+    lat <- coordinate[1]
+    lon <- coordinate[2]
+    coordinate_plus_buffer <- coordinates_to_wkt_square_polygon(lat,lon,buffer_distance)
+    kingdomKey=c(6)
+  } else {
+    kingdomKey=NULL
+  }
   #--------------------------------------
   # Search GBIF for records with images
-  all_gbif_data <- occ_search(scientificName = species_name , mediaType = "StillImage", basisOfRecord="PRESERVED_SPECIMEN", ...)
+  all_gbif_data <- occ_search(scientificName = taxon_name , mediaType = "StillImage", basisOfRecord="PRESERVED_SPECIMEN",geometry=coordinate_plus_buffer,limit=limit,kingdomKey=kingdomKey, ...)
   #--------------------------------------
   # Extract URL and licence type
   metadata <- as.data.frame(all_gbif_data$data)
+  #metadata$kingdom # SET ONLY PLANTS?
+  
   metadata_final <- matrix(nrow=0, ncol=ncol(metadata)+2)
   for(obs_index in 1:nrow(metadata)) {
     media_info <- all_gbif_data$media[[obs_index]][[1]]
@@ -37,7 +51,7 @@ search_specimen_metadata <- function(species_name, ...) {
   colnames(metadata_final) <- c(colnames(metadata), "license","media_url")
   metadata_final <- subset(metadata_final, !grepl("inaturalist",metadata_final$media_url)) # removing inaturalist images
   metadata_final <- metadata_final[!is.na(metadata_final$media_url),]
-  cat(nrow(metadata_final), "records of", species_name, "found with media data.\n")
+  cat(nrow(metadata_final), "records of", taxon_name, "found with media data.\n")
   return(metadata_final)
 }
 
@@ -70,9 +84,12 @@ download_specimen_images <- function(metadata,
     species_name <- metadata$species[specimen_index]
     gbif_key <- metadata$key[specimen_index]
     media <- metadata$media_url[specimen_index]
+    if(is.na(species_name)) {
+      species_name <- "indet"
+    }
     file_name <- paste0(dir_name,"/",paste0(gsub(" ","_",species_name),"_", gbif_key,".jpeg"))
     # Attempt to download the file
-    download <- try(download.file(media, file_name), silent = TRUE)
+    download <- try(download_file_safe(media, file_name), silent = TRUE)
     Sys.sleep(sleep)
     if(!inherits(download, "try-error")) {  # Check if download succeeded
       metadata$status[specimen_index] <- "succeeded"
