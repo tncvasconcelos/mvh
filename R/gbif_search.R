@@ -2,14 +2,21 @@
 #'
 #' This function searches GBIF for records with images of preserved specimens for a given species.
 #'
-#' @param species_name A character string of the scientific name of the species to search for.
+#' @param taxon_name A character string of the scientific name of the taxon to search for.
+#' @coordinate a coordinate point to be passed as latitude and longitude as e.g. c(42, -85) to be the centroid of the
+#' polygon where the search is going to be performed
+#' @buffer_distance A number in degrees for the size of the square around the centroid passed in the argument 
+#' coordinate. If no argument is passed, it will set to 1.
 #' @param ... Additional arguments passed to occ_search function.
 #'
 #' @return A data frame containing metadata for the found specimens, including media URLs and licenses.
 #'
 #' @importFrom rgbif occ_search
 #' @export
-search_specimen_metadata <- function(taxon_name=NULL, coordinate=NULL, buffer_distance=NULL, limit=500, ...) {
+search_specimen_metadata <- function(taxon_name=NULL, 
+                                     coordinate=NULL, 
+                                     buffer_distance=NULL, 
+                                     limit=500, ...) {
   if(!is.null(coordinate)) {
     if(is.null(buffer_distance)){
       buffer_distance=1
@@ -28,8 +35,7 @@ search_specimen_metadata <- function(taxon_name=NULL, coordinate=NULL, buffer_di
   #--------------------------------------
   # Extract URL and licence type
   metadata <- as.data.frame(all_gbif_data$data)
-  #metadata$kingdom # SET ONLY PLANTS?
-  
+
   metadata_final <- matrix(nrow=0, ncol=ncol(metadata)+2)
   for(obs_index in 1:nrow(metadata)) {
     media_info <- all_gbif_data$media[[obs_index]][[1]]
