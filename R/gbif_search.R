@@ -25,9 +25,10 @@ search_specimen_metadata <- function(taxon_name=NULL,
     lat <- coordinate[1]
     lon <- coordinate[2]
     coordinate_plus_buffer <- coordinates_to_wkt_square_polygon(lat,lon,buffer_distance)
-    kingdomKey=c(6)
+    kingdomKey <- c(6)
   } else {
-    kingdomKey=NULL
+    kingdomKey <- NULL
+    coordinate_plus_buffer <- NULL
   }
   #--------------------------------------
   # Search GBIF for records with images
@@ -78,14 +79,22 @@ download_specimen_images <- function(metadata,
   sleep=2,
   result_file_name="download_results",
   timeout_limit=300) {
+  
   create_directory(dir_name)
-
   # Initialize the 'status' and 'error_message' columns
   metadata$filesize <- NA
   metadata$status <- NA
   metadata$error_message <- NA
+  if(is.null(metadata$rightsHolder)){
+    metadata$rightsHolder <- NA
+  }
+  
   options(timeout = max(timeout_limit, getOption("timeout")))
 
+  if(nrow(metadata)==0) {
+    stop("No records to download in metadata.")
+  }
+  
   for(specimen_index in 1:nrow(metadata)) {
     species_name <- metadata$species[specimen_index]
     gbif_key <- metadata$key[specimen_index]
@@ -116,7 +125,7 @@ download_specimen_images <- function(metadata,
       metadata$error_message[specimen_index] <- download[1]
     }
     # Subset metadata to include only the selected columns
-    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "decimalLatitude", "decimalLongitude", "eventDate", "country", "license","rightsHolder","filesize","status", "error_message")]
+    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "eventDate", "country", "license","rightsHolder","filesize","status", "error_message")]
     
     # Save the output
     write.csv(metadata_subset, file=paste0(result_file_name, ".csv"), row.names=FALSE)

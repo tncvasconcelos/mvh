@@ -71,3 +71,20 @@ download_file_safe <- function(url, destfile) {
   # Return the name of the file that was saved
   return(destfile)
 }
+
+
+download_with_retry <- function(url, destfile, max_attempts) {
+  attempt <- 1
+  while (attempt <= max_attempts) {
+    tryCatch({
+      download_file_safe(url, destfile)
+      return(TRUE)
+    }, error = function(e) {
+      message("Attempt ", attempt, " failed: ", e$message)
+      attempt <- attempt + 1
+      Sys.sleep(2)  # Sleep before retrying
+    })
+  }
+  message("Failed to download after ", max_attempts, " attempts: ", url)
+  return(FALSE)
+}
