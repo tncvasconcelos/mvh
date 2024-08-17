@@ -12,14 +12,23 @@
 #'
 plot_specimens_by_institution <- function(metadata) {
   sorted_counts <- sort(table(metadata$institutionCode), decreasing = TRUE)
-  barplot(sorted_counts, main = "Specimens by Institution",
+  par(mar = c(6, 4, 4, 2) + 0.1)
+  bar_positions <- barplot(sorted_counts, main = "Specimens by Institution",
     xlab = "", ylab = "Number of Specimens",
-    col = "lightblue", las = 2)
+    col = "lightblue", las = 1, names.arg = NA)
+  text(x = bar_positions, y = par("usr")[3] - (par("usr")[4]*.05), labels = names(sorted_counts),
+    srt = 45, adj = 1, xpd = TRUE, cex = 0.8)
+  par(mar = c(5, 4, 4, 2) + 0.1)
 }
 
+
 plot_specimens_by_country <- function(metadata) {
+  par(mar = c(6, 4, 4, 2) + 0.1)
   sorted_counts <- sort(table(metadata$country), decreasing = TRUE)
-  barplot(sorted_counts, main = "Specimens by Country",
-          xlab = "", ylab = "Number of Specimens",
-          col = "orange3", las = 2)
+  bar_positions <- barplot(sorted_counts, main = "Specimens by Country",
+    xlab = "", ylab = "Number of Specimens",
+    col = "orange3", las = 1, names.arg = NA)
+  text(x = bar_positions, y = par("usr")[3] - (par("usr")[4]*.05), labels = names(sorted_counts),
+    srt = 45, adj = 1, xpd = TRUE, cex = 0.8)
+  par(mar = c(5, 4, 4, 2) + 0.1)
 }
