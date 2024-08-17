@@ -14,16 +14,16 @@
 #' @importFrom rgbif occ_search
 #' @export
 search_specimen_metadata <- function(taxon_name=NULL, 
-                                     coordinate=NULL, 
+                                     coordinates=NULL, 
                                      buffer_distance=NULL, 
                                      limit=500, ...) {
-  if(!is.null(coordinate)) {
+  if(!is.null(coordinates)) {
     if(is.null(buffer_distance)){
       buffer_distance=1
     } 
-    # coordinates should be passed as e.g. coordinate=c(40, -120)
-    lat <- coordinate[1]
-    lon <- coordinate[2]
+    # coordinates should be passed as e.g. coordinates=c(40, -120)
+    lat <- coordinates[1]
+    lon <- coordinates[2]
     coordinate_plus_buffer <- coordinates_to_wkt_square_polygon(lat,lon,buffer_distance)
     kingdomKey <- c(6)
   } else {
@@ -36,7 +36,6 @@ search_specimen_metadata <- function(taxon_name=NULL,
   #--------------------------------------
   # Extract URL and licence type
   metadata <- as.data.frame(all_gbif_data$data)
-
   metadata_final <- matrix(nrow=0, ncol=ncol(metadata)+2)
   for(obs_index in 1:nrow(metadata)) {
     media_info <- all_gbif_data$media[[obs_index]][[1]]
@@ -52,10 +51,14 @@ search_specimen_metadata <- function(taxon_name=NULL,
         media_license_and_url <- cbind(media_info[which(names(media_info) %in% "license")][i], unname(potential_url)[i])
         metadata_final <- rbind(metadata_final, cbind(metadata[obs_index, ], media_license_and_url))
       }
-    } 
+    } # else {
+    #  print(media_info[which(names_media_info=="references")])
+    #}
   }
+  
   metadata_final <- as.data.frame(metadata_final)
   colnames(metadata_final) <- c(colnames(metadata), "license","media_url")
+  #which(!metadata$gbifID %in% metadata_final$gbifID)
   metadata_final <- subset(metadata_final, !grepl("inaturalist",metadata_final$media_url)) # removing inaturalist images
   metadata_final <- metadata_final[!is.na(metadata_final$media_url),]
   cat(nrow(metadata_final), "records of", taxon_name, "found with media data.\n")
