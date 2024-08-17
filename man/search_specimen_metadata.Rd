@@ -2,18 +2,35 @@
 % Please edit documentation in R/gbif_search.R
 \name{search_specimen_metadata}
 \alias{search_specimen_metadata}
-\title{Search for specimen metadata}
+\title{Search for Specimen Metadata}
 \usage{
-search_specimen_metadata(species_name, ...)
+search_specimen_metadata(
+  taxon_name = NULL,
+  coordinates = NULL,
+  buffer_distance = NULL,
+  limit = 500,
+  ...
+)
 }
 \arguments{
-\item{species_name}{A character string of the scientific name of the species to search for.}
+\item{taxon_name}{A character string representing the scientific name of the taxon to search for.}
 
-\item{...}{Additional arguments passed to occ_search function.}
+\item{coordinates}{A numeric vector representing a coordinate point, passed as latitude and longitude (e.g., \code{c(42, -85)}), to be the centroid of the polygon where the search will be performed.}
+
+\item{buffer_distance}{A numeric value representing the size of the square in degrees around the centroid passed in the \code{coordinates} argument. If not provided, it defaults to 1.}
+
+\item{limit}{Numeric. The maximum number of records to search for on GBIF. Defaults to 500.}
+
+\item{...}{Additional arguments passed to the \code{occ_search} function.}
 }
 \value{
 A data frame containing metadata for the found specimens, including media URLs and licenses.
 }
 \description{
 This function searches GBIF for records with images of preserved specimens for a given species.
+}
+\examples{
+\dontrun{
+metadata <- search_specimen_metadata(taxon_name = "Puma concolor", coordinates = c(42, -85))
+}
 }

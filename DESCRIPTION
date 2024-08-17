@@ -1,18 +1,18 @@
 Package: mvh
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Version: 0.1.0
+Date: 2024-08-17
+Title: My Virtual Herbarium
+Authors@R: c(person("Thais", "Vasconcelos", role = c("aut", "cre"),
+                     email = "tvasc@umich.edu"),
+              person("James", "Boyko", role = "aut",
+                     email = "jboyko@umich.edu"))
+Author: Thais Vasconcelos [aut, cre],
+  James Boyko [aut]
+Maintainer: Thais Vasconcelos <tvasc@umich.edu>
+Imports: magick, rgbif, sf
+Suggests: knitr, rmarkdown
+Description: A software that includes a set of functions designed to search and download metadata and openly available images associated with herbarium specimens based on taxon or geographical area. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-Imports:
-  magick,
-  rgbif
-Suggests: 
-    knitr,
-    rmarkdown
-VignetteBuilder: knitr

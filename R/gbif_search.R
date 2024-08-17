@@ -1,26 +1,30 @@
-#' Search for specimen metadata
+#' Search for Specimen Metadata
 #'
 #' This function searches GBIF for records with images of preserved specimens for a given species.
 #'
-#' @param taxon_name A character string of the scientific name of the taxon to search for.
-#' @coordinate a coordinate point to be passed as latitude and longitude as e.g. c(42, -85) to be the centroid of the
-#' polygon where the search is going to be performed
-#' @buffer_distance A number in degrees for the size of the square around the centroid passed in the argument 
-#' coordinate. If no argument is passed, it will set to 1.
-#' @param ... Additional arguments passed to occ_search function.
+#' @param taxon_name A character string representing the scientific name of the taxon to search for.
+#' @param coordinates A numeric vector representing a coordinate point, passed as latitude and longitude (e.g., `c(42, -85)`), to be the centroid of the polygon where the search will be performed.
+#' @param buffer_distance A numeric value representing the size of the square in degrees around the centroid passed in the `coordinates` argument. If not provided, it defaults to 1.
+#' @param limit Numeric. The maximum number of records to search for on GBIF. Defaults to 500.
+#' @param ... Additional arguments passed to the `occ_search` function.
 #'
 #' @return A data frame containing metadata for the found specimens, including media URLs and licenses.
 #'
 #' @importFrom rgbif occ_search
 #' @export
-search_specimen_metadata <- function(taxon_name=NULL, 
-                                     coordinates=NULL, 
-                                     buffer_distance=NULL, 
+#'
+#' @examples
+#' \dontrun{
+#' metadata <- search_specimen_metadata(taxon_name = "Puma concolor", coordinates = c(42, -85))
+#' }
+search_specimen_metadata <- function(taxon_name=NULL,
+                                     coordinates=NULL,
+                                     buffer_distance=NULL,
                                      limit=500, ...) {
   if(!is.null(coordinates)) {
     if(is.null(buffer_distance)){
       buffer_distance=1
-    } 
+    }
     # coordinates should be passed as e.g. coordinates=c(40, -120)
     lat <- coordinates[1]
     lon <- coordinates[2]
@@ -55,7 +59,7 @@ search_specimen_metadata <- function(taxon_name=NULL,
     #  print(media_info[which(names_media_info=="references")])
     #}
   }
-  
+
   metadata_final <- as.data.frame(metadata_final)
   colnames(metadata_final) <- c(colnames(metadata), "license","media_url")
   #which(!metadata$gbifID %in% metadata_final$gbifID)
@@ -65,37 +69,47 @@ search_specimen_metadata <- function(taxon_name=NULL,
   return(metadata_final)
 }
 
-#' Download specimen images
+#' Download Specimen Images
 #'
 #' This function downloads specimen images based on the provided metadata and optionally resizes them.
 #'
-#' @param metadata A data frame containing specimen metadata, as returned by search.specimen.metadata().
-#' @param resize A character vector specifying resize options (currently not used in the function).
+#' @param metadata A data frame containing specimen metadata, as returned by `search.specimen.metadata()`.
+#' @param resize Numeric. Quality percentage to resize the image, ranging from 0 to 100 (higher values mean better quality).
 #' @param dir_name A character string specifying the directory to save the downloaded images.
 #' @param sleep Numeric. Number of seconds to wait between downloads.
-#' @importFrom utils download.file
+#' @param result_file_name A character string specifying the name of the output CSV file.
+#' @param timeout_limit Numeric. The timeout limit (in seconds) for downloading each image.
 #'
+#' @return A data frame containing the metadata of the downloaded images, including their download status and file size.
+#' @importFrom utils download.file write.csv
+#' @importFrom magick image_info image_read image_write
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' metadata <- search_specimen_metadata(taxon_name = "Myrcia splendens")
+#' download_specimen_images(metadata, dir_name = "my_virtual_collection", resize = 75)
+#' }
 download_specimen_images <- function(metadata,
   dir_name="my_virtual_collection",
   resize=75,
   sleep=2,
   result_file_name="download_results",
   timeout_limit=300) {
-  
+
   create_directory(dir_name)
-  
+
   if(nrow(metadata)==0) {
     stop("No records to download in metadata.")
   }
-  
+
   # Initialize the 'status' and 'error_message' columns
   metadata$filesize <- NA
   metadata$status <- NA
   metadata$error_message <- NA
   if(is.null(metadata$rightsHolder)){
     metadata$rightsHolder <- NA
-  } 
+  }
   if(is.null(metadata$scientificName)){
     metadata$scientificName <- NA
   }
@@ -113,7 +127,7 @@ download_specimen_images <- function(metadata,
   }
 
   options(timeout = max(timeout_limit, getOption("timeout")))
-  
+
   for(specimen_index in 1:nrow(metadata)) {
     species_name <- metadata$species[specimen_index]
     gbif_key <- metadata$key[specimen_index]
@@ -146,7 +160,7 @@ download_specimen_images <- function(metadata,
     }
     # Subset metadata to include only the selected columns
     metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "eventDate", "country", "license","rightsHolder","filesize","status", "error_message")]
-    
+
     # Save the output
     write.csv(metadata_subset, file=paste0(result_file_name, ".csv"), row.names=FALSE)
   }

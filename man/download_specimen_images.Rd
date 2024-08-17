@@ -2,24 +2,39 @@
 % Please edit documentation in R/gbif_search.R
 \name{download_specimen_images}
 \alias{download_specimen_images}
-\title{Download specimen images}
+\title{Download Specimen Images}
 \usage{
 download_specimen_images(
   metadata,
-  dir_name = "my_virtual_collection2",
-  resize = NULL,
-  sleep = 2
+  dir_name = "my_virtual_collection",
+  resize = 75,
+  sleep = 2,
+  result_file_name = "download_results",
+  timeout_limit = 300
 )
 }
 \arguments{
-\item{metadata}{A data frame containing specimen metadata, as returned by search.specimen.metadata().}
+\item{metadata}{A data frame containing specimen metadata, as returned by \code{search.specimen.metadata()}.}
 
 \item{dir_name}{A character string specifying the directory to save the downloaded images.}
 
-\item{resize}{A character vector specifying resize options (currently not used in the function).}
+\item{resize}{Numeric. Quality percentage to resize the image, ranging from 0 to 100 (higher values mean better quality).}
 
 \item{sleep}{Numeric. Number of seconds to wait between downloads.}
+
+\item{result_file_name}{A character string specifying the name of the output CSV file.}
+
+\item{timeout_limit}{Numeric. The timeout limit (in seconds) for downloading each image.}
+}
+\value{
+A data frame containing the metadata of the downloaded images, including their download status and file size.
 }
 \description{
 This function downloads specimen images based on the provided metadata and optionally resizes them.
+}
+\examples{
+\dontrun{
+metadata <- search_specimen_metadata(taxon_name = "Myrcia splendens")
+download_specimen_images(metadata, dir_name = "my_virtual_collection", resize = 75)
+}
 }
