@@ -15,7 +15,7 @@ plot_specimens_by_institution <- function(metadata) {
   par(mar = c(6, 4, 4, 2) + 0.1)
   bar_positions <- barplot(sorted_counts, main = "Specimens by Institution",
     xlab = "", ylab = "Number of Specimens",
-    col = "lightblue", las = 1, names.arg = NA)
+    col = "lightblue", las = 1, names.arg = NA, cex.main = 1, cex.lab = 0.75)
   text(x = bar_positions, y = par("usr")[3] - (par("usr")[4]*.05), labels = names(sorted_counts),
     srt = 45, adj = 1, xpd = TRUE, cex = 0.8)
   par(mar = c(5, 4, 4, 2) + 0.1)
@@ -27,8 +27,8 @@ plot_specimens_by_country <- function(metadata) {
   sorted_counts <- sort(table(metadata$country), decreasing = TRUE)
   bar_positions <- barplot(sorted_counts, main = "Specimens by Country",
     xlab = "", ylab = "Number of Specimens",
-    col = "orange3", las = 1, names.arg = NA)
+    col = "orange3", las = 1, names.arg = NA, cex.main = 1, cex.lab = 0.75)
   text(x = bar_positions, y = par("usr")[3] - (par("usr")[4]*.05), labels = names(sorted_counts),
-    srt = 45, adj = 1, xpd = TRUE, cex = 0.8)
+    srt = 45, adj = 1, xpd = TRUE, cex = 0.75)
   par(mar = c(5, 4, 4, 2) + 0.1)
 }
