@@ -32,7 +32,6 @@ create_directory <- function(dir_name) {
   }
 }
 
-<<<<<<< HEAD
 print_names <- function(names) {
   n <- length(names)
   if (n == 1) {
@@ -45,7 +44,6 @@ print_names <- function(names) {
 }
 
 
-=======
 #' Convert Coordinates to WKT Square Polygon
 #'
 #' This function generates a square polygon in Well-Known Text (WKT) format
@@ -61,7 +59,6 @@ print_names <- function(names) {
 #'
 #' @examples
 #' coordinates_to_wkt_square_polygon(lat = 45.0, lon = -93.0, buffer_distance = 0.01)
->>>>>>> bf92d9743786fa5a8f938e8ce9296fe3baf62aa9
 coordinates_to_wkt_square_polygon <- function(lat,lon,buffer_distance) {
   # Calculate the coordinates of the square's corners
   square_coords <- matrix(c(
