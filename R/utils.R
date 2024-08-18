@@ -32,6 +32,7 @@ create_directory <- function(dir_name) {
   }
 }
 
+<<<<<<< HEAD
 print_names <- function(names) {
   n <- length(names)
   if (n == 1) {
@@ -44,6 +45,23 @@ print_names <- function(names) {
 }
 
 
+=======
+#' Convert Coordinates to WKT Square Polygon
+#'
+#' This function generates a square polygon in Well-Known Text (WKT) format
+#' centered on the provided coordinates and with the specified buffer distance.
+#'
+#' @param lat Numeric. Latitude of the center of the square.
+#' @param lon Numeric. Longitude of the center of the square.
+#' @param buffer_distance Numeric. The distance from the center to each side of the square.
+#'
+#' @return A character string representing the square polygon in WKT format.
+#' @importFrom sf st_polygon st_sfc st_as_text
+#' @export
+#'
+#' @examples
+#' coordinates_to_wkt_square_polygon(lat = 45.0, lon = -93.0, buffer_distance = 0.01)
+>>>>>>> bf92d9743786fa5a8f938e8ce9296fe3baf62aa9
 coordinates_to_wkt_square_polygon <- function(lat,lon,buffer_distance) {
   # Calculate the coordinates of the square's corners
   square_coords <- matrix(c(
@@ -61,7 +79,18 @@ coordinates_to_wkt_square_polygon <- function(lat,lon,buffer_distance) {
   return(wkt_square_polygon)
 }
 
-
+#' Download a File Safely
+#'
+#' This function downloads a file from a URL to a specified destination. If a file with the
+#' same name already exists, it appends a counter to the file name to avoid overwriting.
+#'
+#' @param url Character. The URL from which to download the file.
+#' @param destfile Character. The destination file path where the downloaded file will be saved.
+#'
+#' @return A character string representing the path to the saved file.
+#' @importFrom tools file_ext file_path_sans_ext
+#' @importFrom utils download.file
+#'
 download_file_safe <- function(url, destfile) {
   # Check if the file already exists
   if (file.exists(destfile)) {
@@ -83,7 +112,17 @@ download_file_safe <- function(url, destfile) {
   return(destfile)
 }
 
-
+#' Download a File with Retry Mechanism
+#'
+#' This function attempts to download a file from a URL multiple times until
+#' it succeeds or the maximum number of attempts is reached.
+#'
+#' @param url Character. The URL from which to download the file.
+#' @param destfile Character. The destination file path where the downloaded file will be saved.
+#' @param max_attempts Integer. The maximum number of download attempts before giving up.
+#'
+#' @return Logical. TRUE if the download succeeded, FALSE otherwise.
+#'
 download_with_retry <- function(url, destfile, max_attempts) {
   attempt <- 1
   while (attempt <= max_attempts) {

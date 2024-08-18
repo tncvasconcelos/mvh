@@ -7,7 +7,7 @@
 #' which lists the institution associated with each specimen.
 #'
 #' @return A bar plot showing the number of specimens for each institution.
-#' @importFrom graphics barplot
+#' @importFrom graphics barplot par text
 #' @export
 #'
 plot_specimens_by_institution <- function(metadata) {
@@ -21,7 +21,18 @@ plot_specimens_by_institution <- function(metadata) {
   par(mar = c(5, 4, 4, 2) + 0.1)
 }
 
-
+#' Plot the Number of Specimens by Country
+#'
+#' This function takes metadata containing specimen information and plots the
+#' number of specimens for each country as a bar plot.
+#'
+#' @param metadata A data frame containing at least the column \code{country},
+#' which lists the country associated with each specimen.
+#'
+#' @return A bar plot showing the number of specimens for each country.
+#' @importFrom graphics barplot par text
+#' @export
+#'
 plot_specimens_by_country <- function(metadata) {
   par(mar = c(6, 4, 4, 2) + 0.1)
   sorted_counts <- sort(table(metadata$country), decreasing = TRUE)
