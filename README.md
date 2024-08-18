@@ -1,4 +1,4 @@
-# mvh (My Virtual Herbarium)
+# mvh (my virtual herbarium)
 
 This is an R package for assembling and organizing virtual herbaria.
 package helps you [briefly describe the purpose]. Below, you'll find two pipelines demonstrating how to use the core functions effectively.
