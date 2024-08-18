@@ -33,6 +33,7 @@ search_specimen_metadata <- function(taxon_name=NULL,
   #--------------------------------------
   # Search GBIF for records with images
   all_gbif_data <- occ_search(scientificName = taxon_name , mediaType = "StillImage", basisOfRecord="PRESERVED_SPECIMEN",geometry=coordinate_plus_buffer,limit=limit,kingdomKey=kingdomKey, ...)
+  
   #--------------------------------------
   # Extract URL and licence type
   metadata <- as.data.frame(all_gbif_data$data)
@@ -78,7 +79,7 @@ search_specimen_metadata <- function(taxon_name=NULL,
 #' @export
 download_specimen_images <- function(metadata,
   dir_name="my_virtual_collection",
-  resize=75,
+  resize=NULL,
   sleep=2,
   result_file_name="download_results",
   timeout_limit=300) {
@@ -150,7 +151,12 @@ download_specimen_images <- function(metadata,
     # Save the output
     write.csv(metadata_subset, file=paste0(result_file_name, ".csv"), row.names=FALSE)
   }
-  return(metadata_subset)
+  source_herbaria <- metadata$institutionCode[!is.na(metadata$institutionCode)]
+  if(length(source_herbaria)>0) {
+    cat("Download completed! Don't forget to acknowledge the collections of", 
+        print_names(unique(source_herbaria)),"if you use the specimens in your research.")    
+  }
+  #return(metadata_subset)
 }
 
 # download_specimen_images <- function(metadata, dir_name="my_virtual_collection2", resize=NULL, sleep=2) {

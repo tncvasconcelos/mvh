@@ -32,6 +32,17 @@ create_directory <- function(dir_name) {
   }
 }
 
+print_names <- function(names) {
+  n <- length(names)
+  if (n == 1) {
+    c(names)
+  } else if (n == 2) {
+    c(names[1], "&", names[2])
+  } else {
+    c(paste(names[1:(n-1)], collapse = ", "), "&", names[n])
+  }
+}
+
 
 coordinates_to_wkt_square_polygon <- function(lat,lon,buffer_distance) {
   # Calculate the coordinates of the square's corners
@@ -46,7 +57,7 @@ coordinates_to_wkt_square_polygon <- function(lat,lon,buffer_distance) {
   square_polygon <- sf::st_polygon(list(square_coords))
   square_polygon_sf <- sf::st_sfc(square_polygon, crs = 4326)
   # Convert the square polygon to WKT format
-  wkt_square_polygon <- st_as_text(square_polygon_sf)
+  wkt_square_polygon <- sf::st_as_text(square_polygon_sf)
   return(wkt_square_polygon)
 }
 
