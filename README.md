@@ -3,6 +3,13 @@
 This is an R package for assembling and organizing virtual herbaria.
 
 The example below is of a pipeline to search and download up to eight specimens (“limit=8”) of the blueberry genus *Vaccinium* (Ericaceae) from the Ann Arbor (MI, USA) area (“coordinates = c(42.28, -83.74)”). 
+
+```r
+devtools::install_github("tncvasconcelos/mvh")
+
+
+```
+
 ```r
 metadata <- search_specimen_metadata(taxon_name = "Vaccinium", coordinates= c(42.28, -83.74), limit=8)
 download_specimen_images(metadata,
