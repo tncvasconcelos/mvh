@@ -32,7 +32,7 @@ download_specimen_images(
 )
 ```
 
-![Figure 1: A) Example of a mvh pipeline to search and download up to eight specimens (“limit=8”) of the blueberry genus Vaccinium (Ericaceae) from the Ann Arbor (MI, USA) area (“coordinates = c(42.28, -83.74)”). B) Specimens’ images downloaded as a result of the pipeline. C) Message reminding the user to acknowledge collections where specimens are deposited if they are used in publications.](https://i.imgur.com/Rem46MQ.png)
+![Figure 1: Example output of a mvh pipeline to search and download up to eight specimens (“limit=8”) of the blueberry genus Vaccinium (Ericaceae) from the Ann Arbor (MI, USA) area (“coordinates = c(42.28, -83.74)”).](https://i.imgur.com/ENqrxlf.png)
 
 ### Example 2: Search and Plot Specimens
 
@@ -52,7 +52,7 @@ plot_specimens_by_institution(metadata)
 plot_specimens_by_country(metadata)
 dev.off()
 ```
-![Figure 2: Example of a mvh pipeline to search up to 100 specimens (limit=”100”) of the widespread species Myrcia splendens (Myrtaceae) and plot the number of specimens per institution and country.](https://i.imgur.com/5vc7jfJ.png)
+![Figure 2: Example of a mvh pipeline to search up to 100 specimens (limit=”100”) of the widespread species Myrcia splendens (Myrtaceae) and plot the number of specimens per institution and country.](https://i.imgur.com/90nGD7B.png)
 
 
 ## Function Details
