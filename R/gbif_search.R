@@ -69,7 +69,7 @@ search_specimen_metadata <- function(taxon_name=NULL,
   metadata_final <- subset(metadata_final, !grepl("inaturalist",metadata_final$media_url)) # removing inaturalist images
   metadata_final <- metadata_final[!is.na(metadata_final$media_url),]
   if (verbose) {
-    message(nrow(metadata_final), "records of", taxon_name, "found with media data.\n")
+    message(nrow(metadata_final), " records of ", taxon_name, " found with media data.\n")
   }
   return(metadata_final)
 }
