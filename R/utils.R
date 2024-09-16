@@ -14,23 +14,6 @@ download.file.int <- function(url, destfile) {
   })
 }
 
-#' Create a directory
-#'
-#' This function creates a directory if it doesn't already exist.
-#'
-#' @param dir_name A character string of the directory name to create.
-#'
-#' @export
-create_directory <- function(dir_name) {
-  # Check if the directory already exists
-  if (!dir.exists(dir_name)) {
-    # Create the directory
-    dir.create(dir_name)
-    message("Directory '", dir_name, "' created successfully.")
-  } else {
-    message("Directory '", dir_name, "' already exists.")
-  }
-}
 
 print_names <- function(names) {
   n <- length(names)

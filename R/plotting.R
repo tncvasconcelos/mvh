@@ -11,6 +11,8 @@
 #' @export
 #'
 plot_specimens_by_institution <- function(metadata) {
+  old_par <- par(no.readonly=T)
+  on.exit(old_par)
   sorted_counts <- sort(table(metadata$institutionCode), decreasing = TRUE)
   par(mar = c(6, 4, 4, 2) + 0.1)
   bar_positions <- barplot(sorted_counts, main = "Specimens by Institution",
@@ -34,6 +36,8 @@ plot_specimens_by_institution <- function(metadata) {
 #' @export
 #'
 plot_specimens_by_country <- function(metadata) {
+  old_par <- par(no.readonly=T)
+  on.exit(old_par)
   par(mar = c(6, 4, 4, 2) + 0.1)
   sorted_counts <- sort(table(metadata$country), decreasing = TRUE)
   bar_positions <- barplot(sorted_counts, main = "Specimens by Country",

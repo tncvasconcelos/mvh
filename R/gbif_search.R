@@ -8,19 +8,24 @@
 #' @param limit Numeric. The maximum number of records to search for on GBIF. Defaults to 500.
 #' @param ... Additional arguments passed to the `occ_search` function.
 #'
-#' @return A data frame containing metadata for the found specimens, including media URLs and licenses.
+#' @return A data.frame containing metadata for the found specimens, including media URLs and licenses.
 #'
 #' @importFrom rgbif occ_search
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' metadata <- search_specimen_metadata(taxon_name = "Puma concolor", coordinates = c(42, -85))
+#' \donttest{
+#' metadata <- search_specimen_metadata(taxon_name = "Vaccinium", coordinates = c(42, -85))
+#' }
+#' \value{
+#' A data.frame containing metadata for the found specimens, including media URLs and licenses.
 #' }
 search_specimen_metadata <- function(taxon_name=NULL,
                                      coordinates=NULL,
                                      buffer_distance=NULL,
-                                     limit=500, ...) {
+                                     limit=500,
+                                     verbose = TRUE,
+                                     ...) {
   if(!is.null(coordinates)) {
     if(is.null(buffer_distance)){
       buffer_distance=1
@@ -37,7 +42,7 @@ search_specimen_metadata <- function(taxon_name=NULL,
   #--------------------------------------
   # Search GBIF for records with images
   all_gbif_data <- occ_search(scientificName = taxon_name , mediaType = "StillImage", basisOfRecord="PRESERVED_SPECIMEN",geometry=coordinate_plus_buffer,limit=limit,kingdomKey=kingdomKey, ...)
-  
+
   #--------------------------------------
   # Extract URL and licence type
   metadata <- as.data.frame(all_gbif_data$data)
@@ -56,17 +61,16 @@ search_specimen_metadata <- function(taxon_name=NULL,
         media_license_and_url <- cbind(media_info[which(names(media_info) %in% "license")][i], unname(potential_url)[i])
         metadata_final <- rbind(metadata_final, cbind(metadata[obs_index, ], media_license_and_url))
       }
-    } # else {
-    #  print(media_info[which(names_media_info=="references")])
-    #}
+    }
   }
 
   metadata_final <- as.data.frame(metadata_final)
   colnames(metadata_final) <- c(colnames(metadata), "license","media_url")
-  #which(!metadata$gbifID %in% metadata_final$gbifID)
   metadata_final <- subset(metadata_final, !grepl("inaturalist",metadata_final$media_url)) # removing inaturalist images
   metadata_final <- metadata_final[!is.na(metadata_final$media_url),]
-  cat(nrow(metadata_final), "records of", taxon_name, "found with media data.\n")
+  if (verbose) {
+    message(nrow(metadata_final), "records of", taxon_name, "found with media data.\n")
+  }
   return(metadata_final)
 }
 
@@ -74,31 +78,36 @@ search_specimen_metadata <- function(taxon_name=NULL,
 #'
 #' This function downloads specimen images based on the provided metadata and optionally resizes them.
 #'
-#' @param metadata A data frame containing specimen metadata, as returned by `search.specimen.metadata()`.
+#' @param metadata A data.frame containing specimen metadata, as returned by `search.specimen.metadata()`.
 #' @param resize Numeric. Quality percentage to resize the image, ranging from 0 to 100 (higher values mean better quality).
 #' @param dir_name A character string specifying the directory to save the downloaded images.
 #' @param sleep Numeric. Number of seconds to wait between downloads.
 #' @param result_file_name A character string specifying the name of the output CSV file.
 #' @param timeout_limit Numeric. The timeout limit (in seconds) for downloading each image.
 #'
-#' @return A data frame containing the metadata of the downloaded images, including their download status and file size.
 #' @importFrom utils download.file write.csv
 #' @importFrom magick image_info image_read image_write
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' metadata <- search_specimen_metadata(taxon_name = "Myrcia splendens")
 #' download_specimen_images(metadata, dir_name = "my_virtual_collection", resize = 75)
 #' }
+#' \value{
+#' No return value.
+#' }
 download_specimen_images <- function(metadata,
-  dir_name="my_virtual_collection",
+  dir_name=file.path(tempdir(), "my_virtual_collection"),
   resize=NULL,
   sleep=2,
-  result_file_name="download_results",
-  timeout_limit=300) {
+  result_file_name=file.path(tempdir(), "download_results"),
+  timeout_limit=300,
+  verbose=TRUE) {
 
-  create_directory(dir_name)
+  if(!dir.exists(dir_name)) {
+    dir.create(dir_name, recursive = TRUE)
+  }
 
   if(nrow(metadata)==0) {
     stop("No records to download in metadata.")
@@ -127,6 +136,7 @@ download_specimen_images <- function(metadata,
     metadata$country <- NA
   }
 
+  # Set timeout limit
   options(timeout = max(timeout_limit, getOption("timeout")))
 
   for(specimen_index in 1:nrow(metadata)) {
@@ -136,7 +146,7 @@ download_specimen_images <- function(metadata,
     if(is.na(species_name)) {
       species_name <- "indet"
     }
-    file_name <- paste0(dir_name,"/",paste0(gsub(" ","_",species_name),"_", gbif_key,".jpeg"))
+    file_name <- file.path(dir_name, paste0(gsub(" ", "_", species_name), "_", gbif_key, ".jpeg"))
     # Attempt to download the file
     download <- try(download_file_safe(media, file_name), silent = TRUE)
     Sys.sleep(sleep)
@@ -149,7 +159,9 @@ download_specimen_images <- function(metadata,
         #try_img <- try(resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]), silent = TRUE)
         if(!inherits(try_img, "try-error")) {  # Check if resizing succeeded
           image_write(try_img, file_name, quality=resize)
-          cat("resized","\n")
+          if(verbose) {
+            message("resized","\n")
+          }
         } else {
           metadata$status[specimen_index] <- "failed"
           metadata$error_message[specimen_index] <- try_img[1]
@@ -167,8 +179,8 @@ download_specimen_images <- function(metadata,
   }
   source_herbaria <- metadata$institutionCode[!is.na(metadata$institutionCode)]
   if(length(source_herbaria)>0) {
-    cat("Download completed! Don't forget to acknowledge the collections of", 
-        print_names(unique(source_herbaria)),"if you use the specimens in your research.")    
+    message("Download completed! Don't forget to acknowledge the collections of",
+        print_names(unique(source_herbaria)),"if you use the specimens in your research.")
   }
   #return(metadata_subset)
 }
