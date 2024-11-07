@@ -89,7 +89,7 @@ search_specimen_metadata <- function(taxon_name=NULL,
                                               user = user,
                                               pwd = pwd,
                                               email = email))
-    citation_doi <- gsub("  DOI: ","", doi_output[20])
+    citation_doi <- gsub("  DOI: ","", doi_output[grep("  DOI: ", doi_output)])
     metadata_final <- cbind(metadata_final, citation_doi)
   }
   if (verbose) {
