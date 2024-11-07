@@ -4,8 +4,12 @@
 #'
 #' @param taxon_name A character string representing the scientific name of the taxon to search for.
 #' @param coordinates A numeric vector representing a coordinate point, passed as latitude and longitude (e.g., `c(42, -85)`), to be the centroid of the polygon where the search will be performed.
-#' @param buffer_distance A numeric value representing the size of the square in degrees around the centroid passed in the `coordinates` argument. If not provided, it defaults to 1.
 #' @param limit Numeric. The maximum number of records to search for on GBIF. Defaults to 500.
+#' @param verbose Should the function print the number of records found with media data on console? Default is TRUE.
+#' @param search_type The default is "herbarium" for herbarium specimens. The other option is "cs" for citizen science images (mainly living plants from imported from iNaturalist).
+#' @param user GBIF username. If provided, the function will send a formal download request to GBIF and add a column in the output with the proper DOI citation (RECOMMENDED FOR PUBLICATIONS).
+#' @param pwd GBIF password. If provided, the function will send a formal download request to GBIF and add a column in the output with the proper DOI citation (RECOMMENDED FOR PUBLICATIONS).
+#' @param email GBIF email. If provided, the function will send a formal download request to GBIF and add a column in the output with the proper DOI citation (RECOMMENDED FOR PUBLICATIONS).
 #' @param ... Additional arguments passed to the `occ_search` function.
 #'
 #' @return A data.frame containing metadata for the found specimens, including media URLs and licenses.
@@ -25,6 +29,10 @@ search_specimen_metadata <- function(taxon_name=NULL,
                                      buffer_distance=NULL,
                                      limit=500,
                                      verbose = TRUE,
+                                     search_type="herbarium",
+                                     user = NULL,
+                                     pwd = NULL,
+                                     email = NULL,
                                      ...) {
   if(!is.null(coordinates)) {
     if(is.null(buffer_distance)){
@@ -41,7 +49,13 @@ search_specimen_metadata <- function(taxon_name=NULL,
   }
   #--------------------------------------
   # Search GBIF for records with images
-  all_gbif_data <- occ_search(scientificName = taxon_name , mediaType = "StillImage", basisOfRecord="PRESERVED_SPECIMEN",geometry=coordinate_plus_buffer,limit=limit,kingdomKey=kingdomKey, ...)
+  if(search_type=="herbarium") {
+    search_type <- "PRESERVED_SPECIMEN"
+  } else if(search_type=="cs") {
+    search_type <- "HUMAN_OBSERVATION"
+  }
+
+  all_gbif_data <- occ_search(scientificName = taxon_name , mediaType = "StillImage", basisOfRecord=search_type,geometry=coordinate_plus_buffer,limit=limit,kingdomKey=kingdomKey, ...)
 
   #--------------------------------------
   # Extract URL and licence type
@@ -68,6 +82,16 @@ search_specimen_metadata <- function(taxon_name=NULL,
   colnames(metadata_final) <- c(colnames(metadata), "license","media_url")
   metadata_final <- subset(metadata_final, !grepl("inaturalist",metadata_final$media_url)) # removing inaturalist images
   metadata_final <- metadata_final[!is.na(metadata_final$media_url),]
+
+  # Let's add the doi column if GBIF username is provided:
+  if(!is.null(user) && !is.null(pwd) && !is.null(email)) {
+    doi_output <- capture.output(occ_download(pred_in("occurrenceId", all_gbif_data$data$gbifID),
+                                              user = user,
+                                              pwd = pwd,
+                                              email = email))
+    citation_doi <- gsub("  DOI: ","", doi_output[20])
+    metadata_final <- cbind(metadata_final, citation_doi)
+  }
   if (verbose) {
     message(nrow(metadata_final), " records of ", taxon_name, " found with media data.\n")
   }
