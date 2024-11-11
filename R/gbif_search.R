@@ -140,7 +140,7 @@ download_specimen_images <- function(metadata,
   }
 
   # Initialize the 'status' and 'error_message' columns
-  metadata$filesize <- NA
+  metadata$original_filesize <- NA
   metadata$megapixels <- NA
   metadata$status <- NA
   metadata$error_message <- NA
@@ -179,7 +179,7 @@ download_specimen_images <- function(metadata,
     Sys.sleep(sleep)
     if(!inherits(download_file_name, "try-error")) {  # Check if download succeeded
       metadata$status[specimen_index] <- "succeeded"
-      metadata$filesize[specimen_index] <- as.data.frame(magick::image_info(magick::image_read(download_file_name)))[,"filesize"]
+      metadata$original_filesize[specimen_index] <- as.data.frame(magick::image_info(magick::image_read(download_file_name)))[,"filesize"]
       #------
       # Calculate the current megapixels
       img <- magick::image_read(download_file_name)
