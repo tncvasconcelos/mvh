@@ -202,7 +202,8 @@ download_specimen_images <- function(metadata,
         }
       }
       if(!is.null(max_megapixels)) {
-        try_img <- try(resize.image(download_file_name, current_megapixels, max_megapixels), silent = TRUE)
+        megapixel_perc <- round(sqrt(max_megapixels/current_megapixels) * 100)-1
+        try_img <- try(magick::image_scale(img, paste0(megapixel_perc, "%")), silent = TRUE)
         if(!inherits(try_img, "try-error")) {  # Check if resizing succeeded
           magick::image_write(try_img, download_file_name)
           current_width <- magick::image_info(try_img)$width
@@ -223,7 +224,7 @@ download_specimen_images <- function(metadata,
       metadata$error_message[specimen_index] <- download_file_name[1]
     }
     # Subset metadata to include only the selected columns
-    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "eventDate", "country", "license","rightsHolder","filesize","megapixels","status", "error_message")]
+    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "eventDate", "country", "license","rightsHolder","original_filesize","megapixels","status", "error_message")]
 
     # Save the output
     write.csv(metadata_subset, file=paste0(result_file_name, ".csv"), row.names=FALSE)

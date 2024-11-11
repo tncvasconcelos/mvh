@@ -16,14 +16,16 @@ resize.image <- function(file_name, current_megapixels, max_megapixels) {
   if (current_megapixels <= max_megapixels) {
     return(img)
   }
-
-  # Calculate the scaling factor to resize within the desired megapixel range
-  scaling_factor <- sqrt(max_megapixels / current_megapixels)
-  scaled_width <- round(current_width * scaling_factor)
-  scaled_height <- round(current_height * scaling_factor)
-
+  info <- image_info(img)
+  original_width <- info$width
+  original_height <- info$height
+  aspect_ratio <- original_width / original_height
+  max_pixels <- max_megapixels * 1e6
+  new_width <- sqrt(max_pixels / aspect_ratio)
+  new_height <- new_width / aspect_ratio
+  
   # Resize the image with new dimensions, preserving the aspect ratio
-  resized_img <- magick::image_resize(img, magick::geometry_size_pixels(scaled_width, scaled_height, preserve_aspect = TRUE))
-
+  resized_img <- magick::image_resize(img, geometry = paste0(round(new_width), "x", round(new_height)))
+  
   return(resized_img)
 }
