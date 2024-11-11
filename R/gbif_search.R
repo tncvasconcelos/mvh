@@ -92,7 +92,7 @@ search_specimen_metadata <- function(taxon_name=NULL,
     citation_doi <- gsub("  DOI: ","", doi_output[grep("  DOI: ", doi_output)])
     metadata_final <- cbind(metadata_final, citation_doi)
   }
-  if (verbose) {
+  if(verbose) {
     message(nrow(metadata_final), " records of ", taxon_name, " found with media data.\n")
   }
   return(metadata_final)
@@ -121,9 +121,11 @@ search_specimen_metadata <- function(taxon_name=NULL,
 #' \value{
 #' No return value.
 #' }
+
 download_specimen_images <- function(metadata,
   dir_name=file.path(tempdir(), "my_virtual_collection"),
   resize=NULL,
+  max_megapixels=NULL,
   sleep=2,
   result_file_name=file.path(tempdir(), "download_results"),
   timeout_limit=300,
@@ -139,6 +141,7 @@ download_specimen_images <- function(metadata,
 
   # Initialize the 'status' and 'error_message' columns
   metadata$filesize <- NA
+  metadata$megapixels <- NA
   metadata$status <- NA
   metadata$error_message <- NA
   if(is.null(metadata$rightsHolder)){
@@ -172,17 +175,24 @@ download_specimen_images <- function(metadata,
     }
     file_name <- file.path(dir_name, paste0(gsub(" ", "_", species_name), "_", gbif_key, ".jpeg"))
     # Attempt to download the file
-    download <- try(download_file_safe(media, file_name), silent = TRUE)
+    download_file_name <- try(download_file_safe(media, file_name), silent = TRUE)
     Sys.sleep(sleep)
-    if(!inherits(download, "try-error")) {  # Check if download succeeded
+    if(!inherits(download_file_name, "try-error")) {  # Check if download succeeded
       metadata$status[specimen_index] <- "succeeded"
-      metadata$filesize[specimen_index] <- as.data.frame(magick::image_info(magick::image_read(file_name)))[,"filesize"]
+      metadata$filesize[specimen_index] <- as.data.frame(magick::image_info(magick::image_read(download_file_name)))[,"filesize"]
+      #------
+      # Calculate the current megapixels
+      img <- magick::image_read(download_file_name)
+      current_width <- magick::image_info(img)$width
+      current_height <- magick::image_info(img)$height
+      current_megapixels <- (current_width * current_height) / 1e6
+      #------
+      metadata$megapixels[specimen_index] <- current_megapixels
       # Attempt to resize the image if required
       if(!is.null(resize)) {
-        try_img <- try(magick::image_read(file_name), silent = TRUE)
-        #try_img <- try(resize.image(file_name, min_megapixels=resize[1], max_megapixels=resize[2]), silent = TRUE)
+        try_img <- try(magick::image_read(download_file_name), silent = TRUE)
         if(!inherits(try_img, "try-error")) {  # Check if resizing succeeded
-          image_write(try_img, file_name, quality=resize)
+          magick::image_write(try_img, download_file_name, quality=resize)
           if(verbose) {
             message("resized","\n")
           }
@@ -191,23 +201,42 @@ download_specimen_images <- function(metadata,
           metadata$error_message[specimen_index] <- try_img[1]
         }
       }
+      if(!is.null(max_megapixels)) {
+        try_img <- try(resize.image(download_file_name, current_megapixels, max_megapixels), silent = TRUE)
+        if(!inherits(try_img, "try-error")) {  # Check if resizing succeeded
+          magick::image_write(try_img, download_file_name)
+          current_width <- magick::image_info(try_img)$width
+          current_height <- magick::image_info(try_img)$height
+          current_megapixels <- (current_width * current_height) / 1e6
+          metadata$megapixels[specimen_index] <- round(current_megapixels,4)
+
+          if(verbose) {
+            message("image is now under indicated max megapixels","\n")
+          }
+        } else {
+          metadata$status[specimen_index] <- "failed"
+          metadata$error_message[specimen_index] <- try_img[1]
+        }
+      }
     } else {
       metadata$status[specimen_index] <- "failed"
-      metadata$error_message[specimen_index] <- download[1]
+      metadata$error_message[specimen_index] <- download_file_name[1]
     }
     # Subset metadata to include only the selected columns
-    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "eventDate", "country", "license","rightsHolder","filesize","status", "error_message")]
+    metadata_subset <- metadata[, c("scientificName", "gbifID", "institutionCode", "eventDate", "country", "license","rightsHolder","filesize","megapixels","status", "error_message")]
 
     # Save the output
     write.csv(metadata_subset, file=paste0(result_file_name, ".csv"), row.names=FALSE)
   }
   source_herbaria <- metadata$institutionCode[!is.na(metadata$institutionCode)]
   if(length(source_herbaria)>0) {
-    message("Download completed! Don't forget to acknowledge the collections of",
-        print_names(unique(source_herbaria)),"if you use the specimens in your research.")
+    message("Download completed! Don't forget to acknowledge the collections: ",
+        paste(unique(source_herbaria), collapse=", "),"; if you use the specimens in your research.")
   }
   #return(metadata_subset)
 }
+
+
 
 # download_specimen_images <- function(metadata, dir_name="my_virtual_collection2", resize=NULL, sleep=2) {
 #   create_directory(dir_name)

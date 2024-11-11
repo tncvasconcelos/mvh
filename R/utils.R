@@ -88,6 +88,7 @@ download_file_safe <- function(url, destfile) {
   }
   # Download the file with the new or original name
   download.file(url, destfile)
+  #destfile <- gsub(paste(c(".*\\/", paste0(".",file_extension)), collapse="|"), "", destfile)
   # Return the name of the file that was saved
   return(destfile)
 }
