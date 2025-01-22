@@ -4,6 +4,7 @@
 #'
 #' @param taxon_name A character string representing the scientific name of the taxon to search for.
 #' @param coordinates A numeric vector representing a coordinate point, passed as latitude and longitude (e.g., `c(42, -85)`), to be the centroid of the polygon where the search will be performed.
+#' @param buffer_distance Numeric. How far from the coordinates to search for specimens.
 #' @param limit Numeric. The maximum number of records to search for on GBIF. Defaults to 500.
 #' @param verbose Should the function print the number of records found with media data on console? Default is TRUE.
 #' @param search_type The default is "herbarium" for herbarium specimens. The other option is "cs" for citizen science images (mainly living plants from imported from iNaturalist).
@@ -14,15 +15,13 @@
 #'
 #' @return A data.frame containing metadata for the found specimens, including media URLs and licenses.
 #'
-#' @importFrom rgbif occ_search
+#' @importFrom rgbif occ_search occ_download pred_in
+#' @importFrom utils capture.output
 #' @export
 #'
 #' @examples
 #' \donttest{
 #' metadata <- search_specimen_metadata(taxon_name = "Vaccinium", coordinates = c(42, -85))
-#' }
-#' \value{
-#' A data.frame containing metadata for the found specimens, including media URLs and licenses.
 #' }
 search_specimen_metadata <- function(taxon_name=NULL,
                                      coordinates=NULL,
@@ -120,10 +119,6 @@ search_specimen_metadata <- function(taxon_name=NULL,
 #' metadata <- search_specimen_metadata(taxon_name = "Myrcia splendens")
 #' download_specimen_images(metadata, dir_name = "my_virtual_collection", resize = 75)
 #' }
-#' \value{
-#' No return value.
-#' }
-
 download_specimen_images <- function(metadata,
   dir_name=file.path(tempdir(), "my_virtual_collection"),
   resize=NULL,

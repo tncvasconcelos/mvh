@@ -3,6 +3,7 @@
 #' This function resizes an image to fall within a specified megapixel range.
 #'
 #' @param file_name A character string of the file path of the image to resize.
+#' @param current_megapixels A numeric value of the current megapixels.
 #' @param max_megapixels A numeric value of the maximum desired megapixels.
 #'
 #' @return A magick image object of the resized image.
@@ -23,9 +24,9 @@ resize.image <- function(file_name, current_megapixels, max_megapixels) {
   max_pixels <- max_megapixels * 1e6
   new_width <- sqrt(max_pixels / aspect_ratio)
   new_height <- new_width / aspect_ratio
-  
+
   # Resize the image with new dimensions, preserving the aspect ratio
   resized_img <- magick::image_resize(img, geometry = paste0(round(new_width), "x", round(new_height)))
-  
+
   return(resized_img)
 }

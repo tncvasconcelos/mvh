@@ -22,6 +22,8 @@ search_specimen_metadata(
 
 \item{coordinates}{A numeric vector representing a coordinate point, passed as latitude and longitude (e.g., \code{c(42, -85)}), to be the centroid of the polygon where the search will be performed.}
 
+\item{buffer_distance}{Numeric. How far from the coordinates to search for specimens.}
+
 \item{limit}{Numeric. The maximum number of records to search for on GBIF. Defaults to 500.}
 
 \item{verbose}{Should the function print the number of records found with media data on console? Default is TRUE.}
@@ -45,8 +47,5 @@ This function searches GBIF for records with images of preserved specimens for a
 \examples{
 \donttest{
 metadata <- search_specimen_metadata(taxon_name = "Vaccinium", coordinates = c(42, -85))
-}
-\value{
-A data.frame containing metadata for the found specimens, including media URLs and licenses.
 }
 }

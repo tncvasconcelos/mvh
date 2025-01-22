@@ -40,7 +40,4 @@ This function downloads specimen images based on the provided metadata and optio
 metadata <- search_specimen_metadata(taxon_name = "Myrcia splendens")
 download_specimen_images(metadata, dir_name = "my_virtual_collection", resize = 75)
 }
-\value{
-No return value.
-}
 }

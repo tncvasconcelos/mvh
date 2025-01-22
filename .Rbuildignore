@@ -1,3 +1,9 @@
 ^mvh\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^\.Rhistory$
+^\.gitignore$
+^\.git$
+^\.Rproj\.user$
+^\.Rcheck$
+

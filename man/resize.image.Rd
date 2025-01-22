@@ -9,6 +9,8 @@ resize.image(file_name, current_megapixels, max_megapixels)
 \arguments{
 \item{file_name}{A character string of the file path of the image to resize.}
 
+\item{current_megapixels}{A numeric value of the current megapixels.}
+
 \item{max_megapixels}{A numeric value of the maximum desired megapixels.}
 }
 \value{
