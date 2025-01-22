@@ -104,10 +104,12 @@ search_specimen_metadata <- function(taxon_name=NULL,
 #'
 #' @param metadata A data.frame containing specimen metadata, as returned by `search.specimen.metadata()`.
 #' @param resize Numeric. Quality percentage to resize the image, ranging from 0 to 100 (higher values mean better quality).
+#' @param max_megapixels Numeric. If the photo above is this value it will be reduced to the max_megapixels, otherwise it will remain the same quality.
 #' @param dir_name A character string specifying the directory to save the downloaded images.
 #' @param sleep Numeric. Number of seconds to wait between downloads.
 #' @param result_file_name A character string specifying the name of the output CSV file.
 #' @param timeout_limit Numeric. The timeout limit (in seconds) for downloading each image.
+#' @param verbose Boolean. Whether messages are printed to console.
 #'
 #' @importFrom utils download.file write.csv
 #' @importFrom magick image_info image_read image_write

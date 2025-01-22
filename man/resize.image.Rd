@@ -4,12 +4,10 @@
 \alias{resize.image}
 \title{Resize an image}
 \usage{
-resize.image(file_name, min_megapixels = 20, max_megapixels = 25)
+resize.image(file_name, current_megapixels, max_megapixels)
 }
 \arguments{
 \item{file_name}{A character string of the file path of the image to resize.}
-
-\item{min_megapixels}{A numeric value of the minimum desired megapixels.}
 
 \item{max_megapixels}{A numeric value of the maximum desired megapixels.}
 }

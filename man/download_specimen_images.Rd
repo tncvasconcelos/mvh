@@ -6,35 +6,41 @@
 \usage{
 download_specimen_images(
   metadata,
-  dir_name = "my_virtual_collection",
-  resize = 75,
+  dir_name = file.path(tempdir(), "my_virtual_collection"),
+  resize = NULL,
+  max_megapixels = NULL,
   sleep = 2,
-  result_file_name = "download_results",
-  timeout_limit = 300
+  result_file_name = file.path(tempdir(), "download_results"),
+  timeout_limit = 300,
+  verbose = TRUE
 )
 }
 \arguments{
-\item{metadata}{A data frame containing specimen metadata, as returned by \code{search.specimen.metadata()}.}
+\item{metadata}{A data.frame containing specimen metadata, as returned by \code{search.specimen.metadata()}.}
 
 \item{dir_name}{A character string specifying the directory to save the downloaded images.}
 
 \item{resize}{Numeric. Quality percentage to resize the image, ranging from 0 to 100 (higher values mean better quality).}
+
+\item{max_megapixels}{Numeric. If the photo above is this value it will be reduced to the max_megapixels, otherwise it will remain the same quality.}
 
 \item{sleep}{Numeric. Number of seconds to wait between downloads.}
 
 \item{result_file_name}{A character string specifying the name of the output CSV file.}
 
 \item{timeout_limit}{Numeric. The timeout limit (in seconds) for downloading each image.}
-}
-\value{
-A data frame containing the metadata of the downloaded images, including their download status and file size.
+
+\item{verbose}{Boolean. Whether messages are printed to console.}
 }
 \description{
 This function downloads specimen images based on the provided metadata and optionally resizes them.
 }
 \examples{
-\dontrun{
+\donttest{
 metadata <- search_specimen_metadata(taxon_name = "Myrcia splendens")
 download_specimen_images(metadata, dir_name = "my_virtual_collection", resize = 75)
+}
+\value{
+No return value.
 }
 }

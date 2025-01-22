@@ -1,6 +1,6 @@
 Package: mvh
 Version: 0.1.0
-Date: 2024-08-17
+Date: 2025-01-21
 Title: My Virtual Herbarium
 Authors@R: c(person("Thais", "Vasconcelos", role = c("aut", "cre"),
                      email = "tvasc@umich.edu"),
@@ -11,7 +11,7 @@ Author: Thais Vasconcelos [aut, cre],
 Maintainer: Thais Vasconcelos <tvasc@umich.edu>
 Imports: magick, rgbif, sf
 Suggests: knitr, rmarkdown
-Description: A software that includes a set of functions designed to search and download metadata and openly available images associated with herbarium specimens based on taxon or geographical area. Tools included in the package are described in more detail in Vasconcelos and Boyko (2024) <https://doi.org/10.1101/2024.08.25.609600> 
+Description: This package provides tools designed to search and download metadata and openly available images associated with herbarium specimens based on taxon or geographical area. Tools included in the package are described in more detail in Vasconcelos and Boyko (2024; doi:10.1101/2024.08.25.609600).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -9,6 +9,11 @@ search_specimen_metadata(
   coordinates = NULL,
   buffer_distance = NULL,
   limit = 500,
+  verbose = TRUE,
+  search_type = "herbarium",
+  user = NULL,
+  pwd = NULL,
+  email = NULL,
   ...
 )
 }
@@ -17,20 +22,31 @@ search_specimen_metadata(
 
 \item{coordinates}{A numeric vector representing a coordinate point, passed as latitude and longitude (e.g., \code{c(42, -85)}), to be the centroid of the polygon where the search will be performed.}
 
-\item{buffer_distance}{A numeric value representing the size of the square in degrees around the centroid passed in the \code{coordinates} argument. If not provided, it defaults to 1.}
-
 \item{limit}{Numeric. The maximum number of records to search for on GBIF. Defaults to 500.}
+
+\item{verbose}{Should the function print the number of records found with media data on console? Default is TRUE.}
+
+\item{search_type}{The default is "herbarium" for herbarium specimens. The other option is "cs" for citizen science images (mainly living plants from imported from iNaturalist).}
+
+\item{user}{GBIF username. If provided, the function will send a formal download request to GBIF and add a column in the output with the proper DOI citation (RECOMMENDED FOR PUBLICATIONS).}
+
+\item{pwd}{GBIF password. If provided, the function will send a formal download request to GBIF and add a column in the output with the proper DOI citation (RECOMMENDED FOR PUBLICATIONS).}
+
+\item{email}{GBIF email. If provided, the function will send a formal download request to GBIF and add a column in the output with the proper DOI citation (RECOMMENDED FOR PUBLICATIONS).}
 
 \item{...}{Additional arguments passed to the \code{occ_search} function.}
 }
 \value{
-A data frame containing metadata for the found specimens, including media URLs and licenses.
+A data.frame containing metadata for the found specimens, including media URLs and licenses.
 }
 \description{
 This function searches GBIF for records with images of preserved specimens for a given species.
 }
 \examples{
-\dontrun{
-metadata <- search_specimen_metadata(taxon_name = "Puma concolor", coordinates = c(42, -85))
+\donttest{
+metadata <- search_specimen_metadata(taxon_name = "Vaccinium", coordinates = c(42, -85))
+}
+\value{
+A data.frame containing metadata for the found specimens, including media URLs and licenses.
 }
 }
