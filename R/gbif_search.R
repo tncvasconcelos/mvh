@@ -84,7 +84,7 @@ search_specimen_metadata <- function(taxon_name=NULL,
 
   # Let's add the doi column if GBIF username is provided:
   if(!is.null(user) && !is.null(pwd) && !is.null(email)) {
-    doi_output <- capture.output(occ_download(pred_in("occurrenceId", all_gbif_data$data$gbifID),
+    doi_output <- capture.output(occ_download(pred_in("GBIF_ID", all_gbif_data$data$gbifID),
                                               user = user,
                                               pwd = pwd,
                                               email = email))
